@@ -1,154 +1,177 @@
-# Week 2 Footprinting and Network Discovery
+# Penetration Testing Report
 
-Author: Sifa Obedi Kamendu | Networkwalks B084
+## Footprinting and Network Scanning Phases
 
-Footprinting and Network Discovery Report
+**W2 PM FINAL | CYBERSECURITY | NETWORKWALKS**
 
-Week 2  Networkwalks Cybersecurity Program
+**Author:** Sifa Obedi Kamendu  
+**Program:** NETWORKWALKS Cybersecurity Program  
+**Batch:** B084  
+**Evidence dates:** 13 and 17 November 2026
 
-Sifa Obedi Kamendu  |  Batch B084
-Evidence dates 13 and 17 November 2026
-Public copy with sensitive identifiers removed
+## 1 Liability Disclaimer
 
-1 Liability Disclaimer
+This repository documents educational reconnaissance and network discovery. Further testing requires approval from the system or network owner. No exploitation is documented here. Sensitive identifiers and cookie values have been masked in the public screenshots.
 
-This report documents educational reconnaissance and host discovery. It does not establish permission for further testing. Any future activity must remain within the scope approved by the system or network owner. No exploitation or access to accounts is documented in the supplied evidence.
+## 2 Introduction
 
-2 Introduction
+I used Kali Linux to collect domain and website information about networkwalks.com, and Zenmap on Windows to discover live hosts on my local LAN. My final scan detected **48 live hosts**, including my PC, and displayed **47 MAC addresses**.
 
-I used Kali Linux to gather information about networkwalks.com and Zenmap on Windows to discover live hosts on my local LAN. The final scan reported 48 live hosts and displayed MAC addresses for 47 of them. The website checks identified public DNS information, HTTP headers, web technology fingerprints and a WAF fingerprint. These observations are not proof of exploitable vulnerabilities.
+## 3 Tools Used
 
-The report follows the supplied sample structure using my own findings. Addresses, device identifiers and cookie values are masked in the public evidence. Exact host records remain in the original assignment evidence for private submission.
+| Tool | Purpose |
+|---|---|
+| WHOIS | Read domain registration information |
+| WhatWeb | Identify website technology fingerprints |
+| Nslookup | Resolve the domain through DNS |
+| curl | Inspect HTTP response headers |
+| Wafw00f | Identify a possible web application firewall |
+| DNSRecon | Enumerate DNS records |
+| ipconfig | Identify the active Windows network configuration |
+| Zenmap and Nmap | Discover live hosts and collect MAC addresses |
 
-3 Tools Used
+## 4 Activities Performed
 
-4 Activities Performed
+### 4.1 Footprinting and Reconnaissance
 
-4 1 Footprinting and Reconnaissance
+#### WHOIS
 
-WHOIS
+```bash
+whois networkwalks.com
+```
 
-Command: whois networkwalks.com
+The output listed GoDaddy.com LLC as registrar and HostGator name servers. DNSSEC was listed as unsigned.
 
-The screenshot lists GoDaddy.com LLC as registrar, HostGator name servers and DNSSEC as unsigned. These are registration observations, not evidence that the domain can be compromised.
 
-WhatWeb
+#### WhatWeb
 
-Command: whatweb networkwalks.com
+```bash
+whatweb networkwalks.com
+```
 
-HTTP redirected to HTTPS and the HTTPS page returned 200 OK. WhatWeb reported Apache, WordPress 7.1.4, WordPress Download Manager 3.3.77 and jQuery 3.7.1. These are tool fingerprints, not independently verified installed versions. The Bootstrap version label is also unverified.
+The HTTP page redirected to HTTPS, which returned 200 OK. The output identified Apache and reported WordPress, WordPress Download Manager and jQuery fingerprints. Detected version labels were not independently verified.
 
-Nslookup
 
-Command: nslookup networkwalks.com
+#### DNS Lookup
 
-The query returned an IPv4 address for the domain. The server address is masked in the public screenshots.
+```bash
+nslookup networkwalks.com
+```
 
-HTTP headers
+The domain resolved to an IPv4 address. Addresses are masked in this public screenshot.
 
-Command: curl -I https://networkwalks.com
 
-The response showed HTTP 200 OK, Server Apache, WordPress REST API links and a cookie with Secure and HttpOnly attributes. The cookie value is removed from the public image. This single response is not a complete header or application security assessment.
+#### HTTP Headers
 
-WAF detection
+```bash
+curl -I https://networkwalks.com
+```
 
-Command: wafw00f networkwalks.com
+The response returned 200 OK and showed Apache, WordPress API links and a cookie with Secure and HttpOnly attributes. The cookie value is masked.
 
-Wafw00f reported ModSecurity from SpiderLabs. A fingerprint does not establish whether the WAF blocks attacks effectively.
 
-DNS enumeration
+#### WAF Detection
 
-Command: dnsrecon -d networkwalks.com
+```bash
+wafw00f networkwalks.com
+```
 
-The visible output contains SOA, NS, MX, A, TXT and autodiscover SRV information. It also reports no answer for a DNSSEC query. That message alone is not a validated DNS security weakness.
+Wafw00f reported ModSecurity from SpiderLabs. This fingerprint does not confirm how effectively the WAF protects the application.
 
-I saved terminal output as text using the command followed by | tee ~/Desktop/filename.txt. The screenshots show the captured responses; the report does not claim that every DNS record or website component was enumerated.
 
-4 2 Network Scanning with Zenmap
+#### DNS Enumeration
 
-I checked the active Wi-Fi adapter with ipconfig. Its subnet mask was 255.255.255.0, equivalent to /24. I selected this adapter rather than the disconnected or virtual adapters, then used the Zenmap Ping scan profile to discover live hosts. The screenshot shows nmap -sn followed by my LAN subnet.
+```bash
+dnsrecon -d networkwalks.com
+```
 
-My earlier scan showed fewer hosts. The final output in the uploaded report is the source for the count of 48. Host discovery results can vary between scans; the count describes that scan only. Live hosts are not necessarily all PCs. A topology view generated from discovery is not a verified map of physical switches or cabling.
+The visible output included SOA, NS, MX, A, TXT and autodiscover SRV information. A DNSSEC query returned no answer; this alone does not establish a vulnerability.
 
-5 Risk Analysis and Impact
 
-No confirmed vulnerability or severity rating is assigned. The following observations identify areas for review rather than demonstrated security failures.
+### 4.2 Network Scanning with Zenmap
 
-6 Recommendations
+I ran `ipconfig` on Windows and selected the active Wi-Fi adapter. Its subnet mask was **255.255.255.0**, equivalent to **/24**. Device addresses and my Windows username are hidden in the public screenshot.
 
-Verify actual CMS and plugin versions and maintain supported updates.
 
-Review application headers and cookie settings across relevant responses.
+I selected the Ping scan profile in Zenmap to discover live hosts on the LAN.
 
-Maintain only required DNS records and assess DNSSEC configuration separately.
+| Scan result | Value |
+|---|---|
+| Nmap version | 7.993 |
+| IP addresses scanned | 256 |
+| Live hosts | 48 including my PC |
+| MAC addresses displayed | 47 |
+| Own PC MAC address | Not displayed in the scan |
+| Scan duration | 18.04 seconds |
 
-Review WAF configuration and monitoring through approved testing.
 
-Compare discovered devices with an approved inventory before investigating unexpected entries.
+I exported the topology as a PDF. The image below is a masked copy of that export. This discovery view does not verify physical cabling or switch connections.
 
-Keep complete evidence for private assessment and redact device identifiers and session values before public posting.
 
-7 Conclusion
+## 5 Risk Analysis and Impact
 
-I practised collecting domain and website information, identifying the correct Windows subnet and documenting live host discovery. My final scan found 48 hosts with 47 MAC addresses shown. I learned to distinguish scan observations from confirmed vulnerabilities and to preserve useful evidence while removing sensitive details for public sharing.
+| Observation | Interpretation |
+|---|---|
+| Website technologies identifiable | Can guide software inventory checks; versions need verification |
+| DNS and HTTP information visible | Helps describe infrastructure; public information alone is not a vulnerability |
+| WAF fingerprint detected | Indicates a possible protective component; effectiveness was not tested |
+| 48 LAN hosts discovered | Supports inventory checks; does not prove unauthorized devices are present |
 
-8 Evidence Collected
+No exploitable vulnerability was confirmed by these exercises. Host counts describe the recorded scan and may change over time.
 
-The following images come from my uploaded findings and topology export. Black boxes conceal identifiers and values; scan counts, commands where practical and tool conclusions remain visible. Blank Zenmap setup screenshots were omitted because they do not show results.
+## 6 Recommendations
 
-01 Windows network configuration
+- Verify installed software versions and maintain supported updates.
+- Review HTTP headers, cookies and required DNS records.
+- Review WAF configuration through approved testing.
+- Compare discovered devices against an approved inventory.
+- Keep complete assignment evidence private and mask identifiers before public sharing.
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+## 7 Conclusion
 
-02 Zenmap live hosts
+I learned to collect domain and website information, identify the correct subnet and document network discovery. The final scan found 48 hosts and displayed 47 MAC addresses. I also practised distinguishing tool observations from confirmed vulnerabilities.
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+## 8 Evidence Collected
 
-03 WHOIS
+The screenshots below show my recorded results. Sensitive identifiers and cookie values are masked in this public copy. Images are stored beside this README in the repository root.
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### WHOIS results
 
-04 WhatWeb
+<img src="03_WHOIS.png" alt="WHOIS results" width="100%">
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### WhatWeb results
 
-05 NSlookup
+<img src="04_WhatWeb.png" alt="WhatWeb results" width="100%">
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### DNS Lookup results
 
-06 HTTP headers
+<img src="05_NSlookup.png" alt="DNS Lookup results" width="100%">
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### HTTP Headers results
 
-07 WAF detection
+<img src="06_HTTP_headers.png" alt="HTTP Headers results" width="100%">
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### WAF Detection results
 
-08 DNSRecon
+<img src="07_WAF_detection.png" alt="WAF Detection results" width="100%">
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### DNS Enumeration results
 
-09 Topology 1
+<img src="08_DNSRecon.png" alt="DNS Enumeration results" width="100%">
 
-Redacted evidence for public sharing. The original source is retained separately for private assignment review.
+### Windows network configuration
 
+<img src="01_Windows_network_configuration.png" alt="Windows network configuration" width="100%">
 
-## Screenshots
+### Zenmap live host discovery results
 
-![01_Windows_network_configuration](images/01_Windows_network_configuration.png)
+<img src="02_Zenmap_live_hosts.png" alt="Zenmap live host discovery results" width="100%">
 
-![02_Zenmap_live_hosts](images/02_Zenmap_live_hosts.png)
+### Network topology with addresses masked
 
-![03_WHOIS](images/03_WHOIS.png)
+<img src="09_Topology_1.png" alt="Network topology with addresses masked" width="100%">
 
-![04_WhatWeb](images/04_WhatWeb.png)
+---
 
-![05_NSlookup](images/05_NSlookup.png)
-
-![06_HTTP_headers](images/06_HTTP_headers.png)
-
-![07_WAF_detection](images/07_WAF_detection.png)
-
-![08_DNSRecon](images/08_DNSRecon.png)
-
-![09_Topology_1](images/09_Topology_1.png)
+**Author:** Sifa Obedi Kamendu  
+**Program:** NETWORKWALKS Cybersecurity Program | **Batch:** B084 | **Week:** 02
